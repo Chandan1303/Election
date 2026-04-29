@@ -49,7 +49,7 @@ app.post('/api/chat', async (req, res) => {
     const msg = message.toLowerCase();
 
     // Context-aware logic
-    if (msg.includes('hi') || msg.includes('hello')) {
+    if (msg === 'hi' || msg === 'hello' || msg === 'hey') {
         responseText = "Hello! I am your Smart Election Assistant. How old are you?";
         updatedContext.step = "ask_age";
     } 
@@ -59,11 +59,9 @@ app.post('/api/chat', async (req, res) => {
         if (age < 18) {
             responseText = "Since you are under 18, you are not eligible to vote yet. Which state are you from, so I can show you upcoming dates?";
             updatedContext.step = "ask_state_underage";
-            options = ["Maharashtra", "Delhi", "Karnataka", "Tamil Nadu"];
         } else {
             responseText = "Great! You meet the age requirement. Which Indian state are you from?";
             updatedContext.step = "ask_state";
-            options = ["Maharashtra", "Delhi", "Karnataka", "Tamil Nadu"];
         }
     }
     else if (updatedContext.step === "ask_state_underage" || updatedContext.step === "ask_state") {
