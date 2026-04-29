@@ -1,0 +1,24 @@
+{
+  "name": "election",
+  "version": "1.0.0",
+  "description": "## 1. Project Overview The Smart Election Assistant is an AI-powered interactive web application designed to guide voters through the complex election process. It simplifies registration, checks eligibility, and provides deadlines in an accessible, chat-based interface.",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Chandan1303/Election.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/Chandan1303/Election/issues"
+  },
+  "homepage": "https://github.com/Chandan1303/Election#readme",
+  "dependencies": {
+    "@google/genai": "^1.50.1",
+    "dotenv": "^17.4.2"
+  }
+}

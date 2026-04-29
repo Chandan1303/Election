@@ -2,6 +2,8 @@ const express = require('express');
 const cors = require('cors');
 const fs = require('fs');
 const path = require('path');
+require('dotenv').config();
+const { GoogleGenAI } = require('@google/genai');
 
 const app = express();
 const PORT = process.env.PORT || 3000;
@@ -16,6 +18,19 @@ if (fs.existsSync(dataPath)) {
     data = JSON.parse(fs.readFileSync(dataPath, 'utf8'));
 }
 
+// Initialize Google GenAI
+let aiClient = null;
+if (process.env.GEMINI_API_KEY) {
+    try {
+        aiClient = new GoogleGenAI({ apiKey: process.env.GEMINI_API_KEY });
+        console.log("Google GenAI initialized successfully.");
+    } catch (e) {
+        console.error("Failed to initialize GoogleGenAI", e);
+    }
+} else {
+    console.warn("GEMINI_API_KEY is not set in .env. The chatbot will only use basic fallback logic for unknown queries.");
+}
+
 // Chatbot endpoint with context-aware logic
 const indianStates = [
     "andhra pradesh", "arunachal pradesh", "assam", "bihar", "chhattisgarh", "goa", "gujarat", 
@@ -25,9 +40,9 @@ const indianStates = [
     "uttarakhand", "west bengal", "delhi", "jammu", "kashmir", "puducherry", "chandigarh", "lakshadweep", "ladakh", "andaman"
 ];
 
-app.post('/api/chat', (req, res) => {
+app.post('/api/chat', async (req, res) => {
     const { message, context } = req.body;
-    let responseText = "I'm not sure about that. Let me know if you need help with voter registration, polling locations, or dates.";
+    let responseText = "";
     let updatedContext = context || { step: 'ask_age' };
     let options = [];
 
@@ -118,6 +133,23 @@ app.post('/api/chat', (req, res) => {
     }
     else if (msg.includes('pre-register')) {
         responseText = "If you are 17+ years old, you can apply in advance using Form 6 so you are added to the roll as soon as you turn 18!";
+    }
+    else {
+        // AI Fallback for unscripted queries
+        if (aiClient) {
+            try {
+                const response = await aiClient.models.generateContent({
+                    model: 'gemini-2.5-flash',
+                    contents: `You are a Smart Election Assistant for India. Please provide a short, helpful, and accurate response to the following user query about elections, voting, government, or good works: "${message}". Keep the response under 3 sentences if possible. Be polite and encouraging.`,
+                });
+                responseText = response.text;
+            } catch (err) {
+                console.error("Gemini API error:", err);
+                responseText = "I'm experiencing some technical difficulties reaching my advanced AI. Please try asking again later, or ask me about voter registration, polling locations, or dates!";
+            }
+        } else {
+            responseText = "I'm not exactly sure about that. Let me know if you need help with voter registration, polling locations, or dates. (Developer: Add GEMINI_API_KEY in backend/.env for AI answers)";
+        }
     }
 
     res.json({ response: responseText, context: updatedContext, options });
