@@ -1,0 +1,31 @@
+{
+  "users": {},
+  "faqs": [
+    { "question": "How do I register?", "answer": "You can register online via the NVSP portal (voters.eci.gov.in) or locally at your Electoral Registration Office." },
+    { "question": "What ID do I need?", "answer": "EPIC (Voter ID card), Aadhaar, PAN Card, Passport, or Driving License." },
+    { "question": "Can I vote from home?", "answer": "Yes, postal ballots are available for senior citizens (85+) and PwD voters." }
+  ],
+  "timelines": {
+    "Maharashtra": [
+        { "date": "Oct 22", "event": "Notification Issued" },
+        { "date": "Oct 29", "event": "Last Date for Nominations" },
+        { "date": "Nov 20", "event": "Voting Day" },
+        { "date": "Nov 23", "event": "Counting of Votes" }
+    ],
+    "Jharkhand": [
+        { "date": "Oct 24", "event": "Last Date for Nominations" },
+        { "date": "Nov 13", "event": "Voting Day (Phase 1)" },
+        { "date": "Nov 20", "event": "Voting Day (Phase 2)" },
+        { "date": "Nov 23", "event": "Counting of Votes" }
+    ],
+    "Delhi": [
+        { "date": "Jan 10 (Est)", "event": "Notification Issued" },
+        { "date": "Feb 05 (Est)", "event": "Voting Day" },
+        { "date": "Feb 08 (Est)", "event": "Counting of Votes" }
+    ],
+    "General": [
+        { "date": "2024", "event": "Lok Sabha Elections Completed" },
+        { "date": "Continuous", "event": "Voter Registration Open" }
+    ]
+  }
+}
