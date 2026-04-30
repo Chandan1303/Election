@@ -3,37 +3,58 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Smart Election Assistant powered by Google Cloud and Google GenAI">
     <title>Smart Election Assistant</title>
     <link rel="stylesheet" href="style.css">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    
+    <!-- Google Services: Firebase Initialization (Mock for Hackathon MVP) -->
+    <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-analytics-compat.js"></script>
+    <script>
+        const firebaseConfig = {
+            apiKey: "AIzaSy_MOCK_HACKATHON_KEY",
+            authDomain: "election-assistant.firebaseapp.com",
+            projectId: "promptwars-493103",
+            storageBucket: "election-assistant.appspot.com",
+            messagingSenderId: "123456789",
+            appId: "1:123456789:web:abcdef123456",
+            measurementId: "G-ABCDEF1234"
+        };
+        // Initialize Firebase for basic analytics tracking
+        firebase.initializeApp(firebaseConfig);
+        firebase.analytics();
+        console.log("Google Services: Firebase initialized");
+    </script>
 </head>
 <body>
     <header>
         <div class="logo">
-            <i class="fas fa-vote-yea"></i>
+            <i class="fas fa-vote-yea" aria-hidden="true"></i>
             <h1>Smart Election Assistant</h1>
         </div>
-        <div id="google_translate_element"></div>
+        <div id="google_translate_element" aria-label="Translate Page"></div>
     </header>
 
     <main class="container">
         <!-- Main Chat Area -->
-        <section class="chat-section glass-panel">
+        <section class="chat-section glass-panel" aria-label="Interactive Chat Interface">
             <div class="chat-header">
-                <h2><i class="fas fa-robot"></i> AI Guide</h2>
-                <span class="status-indicator"></span>
+                <h2><i class="fas fa-robot" aria-hidden="true"></i> AI Guide</h2>
+                <span class="status-indicator" aria-label="Status: Online"></span>
             </div>
-            <div class="chat-messages" id="chat-messages">
+            <div class="chat-messages" id="chat-messages" aria-live="polite">
                 <div class="message bot-message">
                     Hello! I am your Smart Election Assistant. I can guide you through the election process. Let's start: How old are you?
                 </div>
             </div>
-            <div class="chat-options" id="chat-options"></div>
+            <div class="chat-options" id="chat-options" aria-label="Quick response options"></div>
             <div class="chat-input-container">
-                <input type="text" id="chat-input" placeholder="Type your message here..." aria-label="Chat input">
-                <button id="send-btn" aria-label="Send message"><i class="fas fa-paper-plane"></i></button>
-                <button id="voice-btn" aria-label="Voice input"><i class="fas fa-microphone"></i></button>
+                <label for="chat-input" class="sr-only">Type your message here</label>
+                <input type="text" id="chat-input" placeholder="Type your message here..." aria-required="true">
+                <button id="send-btn" aria-label="Send message" title="Send message"><i class="fas fa-paper-plane" aria-hidden="true"></i></button>
+                <button id="voice-btn" aria-label="Use voice input" title="Voice input"><i class="fas fa-microphone" aria-hidden="true"></i></button>
             </div>
         </section>
 
@@ -41,25 +62,25 @@
         <div class="info-panel">
             
             <!-- Progress Tracker -->
-            <section class="progress-section card glass-panel">
-                <h3><i class="fas fa-tasks"></i> Voting Steps</h3>
-                <ul class="progress-list">
-                    <li class="step active"><i class="fas fa-check-circle"></i> 1. Check Eligibility</li>
-                    <li class="step"><i class="far fa-circle"></i> 2. Register to Vote</li>
-                    <li class="step"><i class="far fa-circle"></i> 3. Verify Voter ID</li>
-                    <li class="step"><i class="far fa-circle"></i> 4. Find Polling Booth</li>
-                    <li class="step"><i class="far fa-circle"></i> 5. Cast Vote</li>
+            <section class="progress-section card glass-panel" aria-label="Voting Process Progress">
+                <h3><i class="fas fa-tasks" aria-hidden="true"></i> Voting Steps</h3>
+                <ul class="progress-list" role="list">
+                    <li class="step active" aria-current="step"><i class="fas fa-check-circle" aria-hidden="true"></i> 1. Check Eligibility</li>
+                    <li class="step"><i class="far fa-circle" aria-hidden="true"></i> 2. Register to Vote</li>
+                    <li class="step"><i class="far fa-circle" aria-hidden="true"></i> 3. Verify Voter ID</li>
+                    <li class="step"><i class="far fa-circle" aria-hidden="true"></i> 4. Find Polling Booth</li>
+                    <li class="step"><i class="far fa-circle" aria-hidden="true"></i> 5. Cast Vote</li>
                 </ul>
             </section>
 
             <!-- Timeline -->
-            <section class="timeline-section card glass-panel">
-                <h3><i class="fas fa-calendar-alt"></i> Election Timeline</h3>
-                <ul id="timeline-list" class="timeline-list">
+            <section class="timeline-section card glass-panel" aria-label="Election Timeline">
+                <h3><i class="fas fa-calendar-alt" aria-hidden="true"></i> Election Timeline</h3>
+                <ul id="timeline-list" class="timeline-list" role="list">
                     <!-- Populated via JS -->
                 </ul>
-                <a href="https://calendar.google.com/calendar/render?action=TEMPLATE&text=Election+Day&dates=20241105T140000Z/20241105T150000Z&details=Remember+to+vote!&location=Local+Polling+Booth" target="_blank" class="calendar-btn">
-                    <i class="fab fa-google"></i> Add to Google Calendar
+                <a href="https://calendar.google.com/calendar/render?action=TEMPLATE&text=Election+Day&dates=20241105T140000Z/20241105T150000Z&details=Remember+to+vote!&location=Local+Polling+Booth" target="_blank" rel="noopener noreferrer" class="calendar-btn" aria-label="Add election dates to Google Calendar">
+                    <i class="fab fa-google" aria-hidden="true"></i> Add to Google Calendar
                 </a>
             </section>
 
