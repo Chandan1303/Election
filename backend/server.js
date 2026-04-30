@@ -17,10 +17,9 @@ const MAX_REQUESTS = 100;
 app.use((req, res, next) => {
     // 1. Security: Advanced Headers
     res.setHeader('X-Content-Type-Options', 'nosniff');
-    res.setHeader('X-Frame-Options', 'DENY');
     res.setHeader('X-XSS-Protection', '1; mode=block');
     res.setHeader('Strict-Transport-Security', 'max-age=31536000; includeSubDomains');
-    res.setHeader('Content-Security-Policy', "default-src 'self' https://maps.google.com https://fonts.googleapis.com https://fonts.gstatic.com https://cdnjs.cloudflare.com https://translate.google.com https://translate.googleapis.com 'unsafe-inline' 'unsafe-eval'; img-src 'self' data: https://www.gstatic.com https://translate.google.com https://translate.googleapis.com;");
+    res.setHeader('Content-Security-Policy', "default-src 'self' https://maps.google.com https://fonts.googleapis.com https://fonts.gstatic.com https://cdnjs.cloudflare.com https://translate.google.com https://translate.googleapis.com 'unsafe-inline' 'unsafe-eval'; img-src 'self' data: https://www.gstatic.com https://translate.google.com https://translate.googleapis.com; frame-ancestors *;");
     res.removeHeader('X-Powered-By');
 
     // 2. Efficiency: Native Gzip Compression
@@ -28,8 +27,22 @@ app.use((req, res, next) => {
     if (acceptEncoding && acceptEncoding.includes('gzip')) {
         const oldWrite = res.write;
         const oldEnd = res.end;
+        const oldSetHeader = res.setHeader;
+        const oldWriteHead = res.writeHead;
         const gzip = zlib.createGzip();
+        
+        res.setHeader = function (name, value) {
+            if (name.toLowerCase() === 'content-length') return;
+            oldSetHeader.call(res, name, value);
+        };
+        
+        res.writeHead = function (statusCode, ...args) {
+            res.removeHeader('content-length');
+            oldWriteHead.apply(res, [statusCode, ...args]);
+        };
+        
         res.setHeader('Content-Encoding', 'gzip');
+        res.removeHeader('content-length');
         
         gzip.on('data', chunk => {
             oldWrite.call(res, chunk);
