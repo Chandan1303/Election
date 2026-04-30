@@ -156,14 +156,23 @@ app.post('/api/chat', async (req, res) => {
     res.json({ response: responseText, context: updatedContext, options });
 });
 
+// Add basic security headers
+app.use((req, res, next) => {
+    res.setHeader('X-Content-Type-Options', 'nosniff');
+    res.setHeader('X-Frame-Options', 'DENY');
+    res.setHeader('X-XSS-Protection', '1; mode=block');
+    res.setHeader('Strict-Transport-Security', 'max-age=31536000; includeSubDomains');
+    next();
+});
+
 // APIs for frontend
 app.get('/api/faqs', (req, res) => {
-    res.json(data.faqs);
+    res.json(data.faqs || []);
 });
 
 app.get('/api/timeline', (req, res) => {
     const state = req.query.state || 'General';
-    let timelineData = data.timelines[state];
+    let timelineData = data.timelines && data.timelines[state];
     
     if (!timelineData) {
         timelineData = [
@@ -175,6 +184,10 @@ app.get('/api/timeline', (req, res) => {
     res.json(timelineData);
 });
 
-app.listen(PORT, () => {
-    console.log(`Backend server running on http://localhost:${PORT}`);
-});
+if (require.main === module) {
+    app.listen(PORT, () => {
+        console.log(`Backend server running on http://localhost:${PORT}`);
+    });
+}
+
+module.exports = app;

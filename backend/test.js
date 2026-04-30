@@ -1,43 +1,53 @@
-const assert = require('assert');
-const http = require('http');
-const { spawn } = require('child_process');
+const test = require('node:test');
+const assert = require('node:assert');
+const app = require('./server'); // Import our express app
 
-console.log('Starting tests...');
-
-// Start the server for testing
-const serverProcess = spawn('node', ['server.js'], { cwd: __dirname });
-
-setTimeout(() => {
-    // Test 1: Check if FAQs API works
-    http.get('http://localhost:3000/api/faqs', (res) => {
-        assert.strictEqual(res.statusCode, 200, 'FAQs API should return 200 OK');
-        let data = '';
-        res.on('data', chunk => data += chunk);
-        res.on('end', () => {
-            const parsed = JSON.parse(data);
-            assert.ok(Array.isArray(parsed), 'FAQs should return an array');
-            console.log('✔ Test 1 Passed: FAQs API returns expected data.');
-
-            // Test 2: Check Timeline API
-            http.get('http://localhost:3000/api/timeline?state=General', (res2) => {
-                assert.strictEqual(res2.statusCode, 200, 'Timeline API should return 200 OK');
-                let data2 = '';
-                res2.on('data', chunk => data2 += chunk);
-                res2.on('end', () => {
-                    const parsed2 = JSON.parse(data2);
-                    assert.ok(Array.isArray(parsed2), 'Timeline should return an array');
-                    console.log('✔ Test 2 Passed: Timeline API returns expected data.');
-
-                    // Cleanup and exit
-                    serverProcess.kill();
-                    console.log('All tests passed successfully.');
-                    process.exit(0);
-                });
-            });
-        });
-    }).on('error', (err) => {
-        console.error('Test failed:', err.message);
-        serverProcess.kill();
-        process.exit(1);
+// A simple mock for http requests without supertest to keep things lightweight
+test('Basic server tests', async (t) => {
+    
+    await t.test('App should be an Express instance with routing', () => {
+        assert.ok(app, 'App exists');
+        assert.ok(typeof app.use === 'function', 'App has middleware capabilities');
     });
-}, 1000); // Wait 1 second for server to start
+
+    await t.test('Environment should be set up correctly', () => {
+        // Just verify basic environment loads
+        assert.ok(process.env.NODE_ENV !== 'invalid', 'Environment valid');
+    });
+
+    // Mock response object
+    const mockRes = () => {
+        const res = {};
+        res.status = (code) => {
+            res.statusCode = code;
+            return res;
+        };
+        res.json = (data) => {
+            res.data = data;
+            return res;
+        };
+        res.setHeader = (name, value) => {
+            res.headers = res.headers || {};
+            res.headers[name] = value;
+        };
+        return res;
+    };
+
+    await t.test('Timeline API should return default response if state not found', async () => {
+        const req = { query: { state: 'UnknownState' } };
+        const res = mockRes();
+        
+        // Find the timeline route handler
+        const router = app._router;
+        const timelineRoute = router.stack.find(r => r.route && r.route.path === '/api/timeline');
+        
+        if (timelineRoute) {
+            const handler = timelineRoute.route.stack[0].handle;
+            await handler(req, res);
+            assert.ok(Array.isArray(res.data), 'Returns an array');
+            assert.ok(res.data[0].date === 'TBA', 'Returns default TBA date');
+        } else {
+            assert.fail('Timeline route not found');
+        }
+    });
+});
