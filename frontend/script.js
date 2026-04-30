@@ -5,7 +5,8 @@ const optionsContainer = document.getElementById('chat-options');
 const voiceBtn = document.getElementById('voice-btn');
 
 let chatContext = { step: 'ask_age' };
-const BACKEND_URL = 'http://localhost:3000/api';
+// Automatically use current origin for API in production, localhost for dev
+const BACKEND_URL = window.location.origin.includes('localhost') ? 'http://localhost:3000/api' : '/api';
 
 // Initialize
 document.addEventListener('DOMContentLoaded', () => {
